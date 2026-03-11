@@ -1,0 +1,43 @@
+name: MLOps CI/CD Pipeline
+
+# This triggers the pipeline every time someone pushes code to the main branch
+on:
+  push:
+    branches: ["main"]
+  pull_request:
+    branches: ["main"]
+
+jobs:
+  # JOB 1: Continuous Integration (Code Quality)
+  code-quality:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.11"
+
+      - name: Install Linter
+        run: |
+          python -m pip install --upgrade pip
+          pip install flake8
+
+      - name: Check for Syntax Errors
+        run: |
+          # This scans main.py to ensure a Data Scientist didn't introduce fatal errors
+          flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
+
+  # JOB 2: Continuous Deployment (Containerization)
+  build-container:
+    needs: code-quality # This ensures it only builds IF the Python code passes the tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: Build the AI Application Docker Image
+        # This proves the Dockerfile is valid and the dependencies can be resolved
+        run: docker build . --file Dockerfile --tag mock-ai-app:ci-test
