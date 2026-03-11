@@ -1,0 +1,6 @@
+fastapi==0.135.1
+uvicorn
+pydantic==2.11.10
+crewai==1.9.3
+boto3
+prometheus-client

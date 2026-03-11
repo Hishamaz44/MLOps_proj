@@ -1,0 +1,15 @@
+# Virtual Environment
+venv/
+env/
+.env/
+
+# Python Cache
+__pycache__/
+*.pyc
+
+# Local Data & Logs
+localstack_data/
+prometheus/
+
+# OS files
+.DS_Store

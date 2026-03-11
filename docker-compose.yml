@@ -1,0 +1,35 @@
+services:
+  # 1. Your existing LocalStack
+  localstack:
+    image: localstack/localstack:latest
+    container_name: allianz_infrastructure
+    ports:
+      - "4566:4566"
+    environment:
+      - SERVICES=s3
+      - DEBUG=1
+      - DOCKER_HOST=unix:///var/run/docker.sock
+    volumes:
+      - "./localstack_data:/var/lib/localstack"
+
+  # 2. Prometheus (Database)
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: allianz_prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+    extra_hosts:
+      - "host.docker.internal:host-gateway" # Gives Prometheus permission to see your Mac
+
+  # 3. Grafana (Dashboard)
+  grafana:
+    image: grafana/grafana:latest
+    container_name: allianz_grafana
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+    depends_on:
+      - prometheus
