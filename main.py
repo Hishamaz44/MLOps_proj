@@ -104,7 +104,6 @@ def upload_and_verify(content: str) -> bool:
         print(f"Verification failed: {e}")
         return False
 
-# ... after result = crew.kickoff() ...
 
 @app.post("/analyze_code")
 async def analyze_code(request: AnalysisRequest):
