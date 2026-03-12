@@ -15,6 +15,7 @@ app = FastAPI(title='MLOps Mock App')
 # 2. Initialize the class
 class AnalysisRequest(BaseModel):
     code_input: str
+    dry_run: bool = False
 
 # Gauge 1
 REQUEST_COUNT = Counter(
@@ -104,12 +105,46 @@ def upload_and_verify(content: str) -> bool:
         print(f"Verification failed: {e}")
         return False
 
+# @app.post("/debate")
+# async def debate(request: DebateRequest):
+#     start_time = time.time()
+
+#     analysis_task = Task(
+#         description=f""" You are a debater that wants to get to the bottom of things
+#         {request.code_input}
+        
+#         List the main functions and what the inputs/outputs are.""",
+#         expected_output="A bulleted list of technical components and logic flow.",
+#         agent=analyst
+#     )
+
+#     writing_task = Task(
+#         description="""Based on the technical analysis, write a 3-step 'Quick Start Guide'. 
+#         Use simple language. Make it look professional in Markdown format.""",
+#         expected_output="A Markdown formatted Quick Start Guide ready for a README file.",  
+#         agent=writer
+#     )
+
+
 
 @app.post("/analyze_code")
 async def analyze_code(request: AnalysisRequest):
     # 4. TASK DEFINITIONS
 
     start_time = time.time()
+
+    # SRE Simulation Mode
+    if request.dry_run: 
+        time.sleep(0.5)
+        results_str = "DRY RUN: This is a simulated AI response for load testing"
+        REQUEST_COUNT.labels(endpoint='/analyze_code', http_status=500).inc()
+        REQUEST_LATENCY.labels(endpoint='/analyze_code').observe(time.time() - start_time)
+
+        return {
+            'status': 'success',
+            'message': 'DRY RUN',
+            's3_bucket': 'skipped'
+        }
 
     analysis_task = Task(
         description=f"""Carefully read this code snippet:
@@ -136,7 +171,7 @@ async def analyze_code(request: AnalysisRequest):
     )
 
     try:
-        result = documentation_crew.kickoff()
+        result = await documentation_crew.kickoff_async()
         result_str = str(result)
 
         s3_success = upload_and_verify(result_str)
