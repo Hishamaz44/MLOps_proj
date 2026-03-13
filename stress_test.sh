@@ -12,8 +12,8 @@ CODE_SAMPLES=(
     "import os; print(os.listdir('.'))"
 )
 
-echo "🔥 SRE LOAD TEST: Simulating concurrent code analysis requests..."
-echo "Targeting: $URL"
+echo "Simulating concurrent code analysis requests..."
+
 
 # Start the timer
 START_TIME=$(date +%s)
@@ -21,7 +21,7 @@ START_TIME=$(date +%s)
 for i in {0..3}
 do
   SAMPLE=${CODE_SAMPLES[$i]}
-  echo "👉 Dispatching Request $((i+1)): Analyzing snippet '$SAMPLE'"
+  echo "Request $((i+1)): Analyzing snippet '$SAMPLE'"
   
   # Send request to background
   curl -s -X POST "$URL" \
@@ -30,13 +30,11 @@ do
     -o /dev/null & 
 done
 
-echo "⏳ All requests dispatched. The AI Agents are working..."
+echo "The AI Agents are working."
 wait # Wait for the background processes to finish
 
 END_TIME=$(date +%s)
 DURATION=$((END_TIME - START_TIME))
 
-echo "------------------------------------------------"
-echo "✅ LOAD TEST COMPLETE"
+echo "TEST COMPLETE"
 echo "Total Time: $DURATION seconds"
-echo "Check your Grafana Dashboard for the Latency Spike!"

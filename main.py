@@ -220,7 +220,7 @@ async def analyze_code(request: AnalysisRequest):
 
     # SRE Simulation Mode
     if request.dry_run: 
-        time.sleep(0.5)
+        time.sleep(0.1)
         results_str = "DRY RUN: This is a simulated AI response for load testing"
         REQUEST_COUNT.labels(endpoint='/analyze_code', http_status=200).inc()
         REQUEST_LATENCY.labels(endpoint='/analyze_code').observe(time.time() - start_time)

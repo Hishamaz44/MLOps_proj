@@ -3,7 +3,7 @@
 URL="http://localhost:8000/analyze_code"
 TOTAL_REQUESTS=100
 
-echo "🌪️ SRE PLATFORM SCALE TEST STARTING..."
+
 echo "Sending $TOTAL_REQUESTS concurrent requests with AI bypassed (dry_run=true)..."
 
 START_TIME=$(date +%s)
@@ -17,12 +17,11 @@ do
     -o /dev/null & 
 done
 
-echo "⏳ Waiting for the API to process the queue..."
+echo "Waiting for the API to process the queue."
 wait
 
 END_TIME=$(date +%s)
 DURATION=$((END_TIME - START_TIME))
 
-echo "✅ MOCK STRESS TEST COMPLETE!"
+
 echo "Processed $TOTAL_REQUESTS requests in $DURATION seconds."
-echo "Check your Grafana Request Rate (RPM) panel for the massive spike!"
